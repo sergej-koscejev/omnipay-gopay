@@ -319,7 +319,7 @@ class GopaySoap
         if (is_null($wsdlUrl)) {
             $wsdlUrl = GopayConfig::ws();
         }
-        ini_set("soap.wsdl_cache_enabled", "0");
+        //ini_set("soap.wsdl_cache_enabled", "0");
         $go_client = new SoapClient($wsdlUrl, array());
         return $go_client;
     }

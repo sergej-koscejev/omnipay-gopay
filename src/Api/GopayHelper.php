@@ -272,7 +272,7 @@ class GopayHelper
      * @param string $productName - nazev objednavky / zbozi
      * @param string $secureKey - kryptovaci klic prideleny prijemci, urceny k podepisovani komunikace
      *
-     * @throw Exception
+     * @throws Exception
      */
     public static function checkPaymentStatus($paymentStatus,
                                               $sessionState,
@@ -524,7 +524,7 @@ class GopayHelper
      * @param float $paymentSessionId - identifikator platby na GoPay
      * @param string $secureKey - kryptovaci klic prideleny eshopu / uzivateli, urceny k podepisovani komunikace
      *
-     * @throw Exception
+     * @throws Exception
      */
     public static function checkPaymentResult($returnedPaymentSessionId,
                                               $returnedEncryptedSignature,
