@@ -19,7 +19,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Omnipay\\GoPay\\" : "src/" }
+        "psr-4": {"Omnipay\\Gopay\\": "src/"}
     },
     "require": {
         "omnipay/common": "~2.0"
