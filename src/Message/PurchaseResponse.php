@@ -19,6 +19,11 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
         return false;
     }
 
+    public function isTransparentRedirect()
+    {
+        return false;
+    }
+
     /**
      * Does the response require a redirect?
      *
@@ -26,9 +31,10 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
      */
     public function isRedirect()
     {
-        return $this->getData()->result == GopayHelper::CALL_COMPLETED
-        && $this->getData()->sessionState == GopayHelper::CREATED
-        && $this->getData()->paymentSessionId > 0;
+        $data = $this->getData();
+        return $data->result == GopayHelper::CALL_COMPLETED
+        && $data->sessionState == GopayHelper::CREATED
+        && $data->paymentSessionId > 0;
     }
 
     public function getMessage()
