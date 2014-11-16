@@ -2,13 +2,30 @@
 
 namespace Omnipay\Gopay\Message;
 
+use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;
+use Omnipay\Common\Message\RequestInterface;
 use Omnipay\Gopay\Api\GopayConfig;
 use Omnipay\Gopay\Api\GopayHelper;
 
 class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
+    public function __construct(RequestInterface $request, $data)
+    {
+        parent::__construct($request, $data);
+
+        $requestParams = $request->getParameters();
+        $secureKey = $requestParams['secureKey'];
+
+        $hashedSignature = GopayHelper::hash(GopayHelper::concatPaymentStatus($data, $secureKey));
+        $decryptedHash = GopayHelper::decrypt($data->encryptedSignature, $secureKey);
+
+        if ($decryptedHash != $hashedSignature) {
+            throw new InvalidResponseException("Invalid response signature");
+        }
+    }
+
     /**
      * Is the response successful?
      *
@@ -33,8 +50,8 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
     {
         $data = $this->getData();
         return $data->result == GopayHelper::CALL_COMPLETED
-        && $data->sessionState == GopayHelper::CREATED
-        && $data->paymentSessionId > 0;
+            && $data->sessionState == GopayHelper::CREATED
+            && $data->paymentSessionId > 0;
     }
 
     public function getMessage()

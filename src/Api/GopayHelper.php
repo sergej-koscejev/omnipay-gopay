@@ -320,22 +320,7 @@ class GopayHelper
         /*
          * Kontrola podpisu objednavky
          */
-        $hashedSignature = GopayHelper::hash(
-            GopayHelper::concatPaymentStatus(
-                $paymentStatus->targetGoId,
-                $paymentStatus->productName,
-                $paymentStatus->totalPrice,
-                $paymentStatus->currency,
-                $paymentStatus->orderNumber,
-                $paymentStatus->recurrentPayment,
-                $paymentStatus->parentPaymentSessionId,
-                $paymentStatus->preAuthorization,
-                $paymentStatus->result,
-                $paymentStatus->sessionState,
-                $paymentStatus->sessionSubState,
-                $paymentStatus->paymentChannel,
-                $secureKey)
-        );
+        $hashedSignature = GopayHelper::hash(GopayHelper::concatPaymentStatus($paymentStatus, $secureKey));
 
         $decryptedHash = GopayHelper::decrypt($paymentStatus->encryptedSignature, $secureKey);
 
@@ -365,40 +350,29 @@ class GopayHelper
     /**
      * Sestaveni retezce pro podpis vysledku stavu platby.
      *
-     * @param float $goId - identifikator prijemce prideleny GoPay
-     * @param string $productName - popis objednavky zobrazujici se na platebni brane
-     * @param float $totalPriceInCents - celkova cena objednavky v halerich
-     * @param string $currency - identifikator meny platby
-     * @param string $orderNumber - identifikator objednavky u prijemce
-     * @param float $parentPaymentSessionId - id puvodni platby pri opakovane platbe
-     * @param int $preAuthorization - jedna-li se o predautorizovanou platbu true => 1, false => 0, null=>""
-     * @param int $recurrentPayment - jedna-li se o opakovanou platbu true => 1, false => 0, null=>""
-     * @param string $result - vysledek volani (CALL_COMPLETED / CALL_FAILED)
-     * @param string $sessionState - stav platby - viz GopayHelper
-     * @param string $sessionSubState - podstav platby - detailnejsi popis stavu platby
-     * @param string $paymentChannel - pouzita platebni metoda
+     * @param object $paymentStatus - objekt stavu platby
      * @param string $secureKey - kryptovaci klic prideleny prijemci, urceny k podepisovani komunikace
      * @return string retezec pro podpis
      */
-    public static function concatPaymentStatus($goId,
-                                               $productName,
-                                               $totalPriceInCents,
-                                               $currency,
-                                               $orderNumber,
-                                               $recurrentPayment,
-                                               $parentPaymentSessionId,
-                                               $preAuthorization,
-                                               $result,
-                                               $sessionState,
-                                               $sessionSubState,
-                                               $paymentChannel,
-                                               $secureKey)
+    public static function concatPaymentStatus($paymentStatus, $secureKey)
     {
 
-        $preAuthorization = GopayHelper::castBooleanForWS($preAuthorization);
-        $recurrentPayment = GopayHelper::castBooleanForWS($recurrentPayment);
+        $preAuthorization = GopayHelper::castBooleanForWS($paymentStatus->preAuthorization);
+        $recurrentPayment = GopayHelper::castBooleanForWS($paymentStatus->recurrentPayment);
 
-        return $goId . "|" . trim($productName) . "|" . $totalPriceInCents . "|" . $currency . "|" . trim($orderNumber) . "|" . $recurrentPayment . "|" . $parentPaymentSessionId . "|" . $preAuthorization . "|" . $result . "|" . $sessionState . "|" . $sessionSubState . "|" . $paymentChannel . "|" . $secureKey;
+        return $paymentStatus->targetGoId
+            . "|" . trim($paymentStatus->productName)
+            . "|" . $paymentStatus->totalPrice
+            . "|" . $paymentStatus->currency
+            . "|" . trim($paymentStatus->orderNumber)
+            . "|" . $recurrentPayment
+            . "|" . $paymentStatus->parentPaymentSessionId
+            . "|" . $preAuthorization
+            . "|" . $paymentStatus->result
+            . "|" . $paymentStatus->sessionState
+            . "|" . $paymentStatus->sessionSubState
+            . "|" . $paymentStatus->paymentChannel
+            . "|" . $secureKey;
     }
 
     /**

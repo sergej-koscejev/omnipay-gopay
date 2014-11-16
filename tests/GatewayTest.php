@@ -1,11 +1,12 @@
 <?php
 namespace Omnipay\Gopay;
 
-use Omnipay\Gopay\Api\GopayHelper;
+use Omnipay\Gopay\Message\PurchaseResponseTest;
 use Omnipay\Tests\GatewayTestCase;
 
 class GatewayTest extends GatewayTestCase
 {
+    private $secureKey = '9876543210abcdef';
     protected $gateway;
     protected $soapClient;
     protected $options;
@@ -17,7 +18,7 @@ class GatewayTest extends GatewayTestCase
 
         $this->gateway = new Gateway($this->soapClient);
         $this->gateway->setGoId('12345');
-        $this->gateway->setSecureKey('98765');
+        $this->gateway->setSecureKey($this->secureKey);
 
         $this->options = array(
             'card' => $this->getValidCard()
@@ -26,10 +27,7 @@ class GatewayTest extends GatewayTestCase
 
     public function testPurchase()
     {
-        $soapResponse = new \stdClass();
-        $soapResponse->result = GopayHelper::CALL_COMPLETED;
-        $soapResponse->sessionState = GopayHelper::CREATED;
-        $soapResponse->paymentSessionId = 1234;
+        $soapResponse = PurchaseResponseTest::successfulResponseData($this->secureKey);
 
         $this->soapClient->expects($this->once())->method('createPayment')
             ->with($this->anything())

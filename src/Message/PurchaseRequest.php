@@ -2,8 +2,8 @@
 
 namespace Omnipay\Gopay\Message;
 
+use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
-use Omnipay\Gopay\Api\GopayConfig;
 use Omnipay\Gopay\Api\GopaySoap;
 
 class PurchaseRequest extends AbstractSoapRequest
@@ -26,8 +26,18 @@ class PurchaseRequest extends AbstractSoapRequest
      */
     public function getData()
     {
+        $goId = $this->getGoId();
+        if (!is_numeric($goId)) {
+            throw new InvalidRequestException("goId should be set to a numeric value, was: " . $goId);
+        }
+
+        $secureKey = $this->getSecureKey();
+        if (!is_string($secureKey)) {
+            throw new InvalidRequestException("secureKey should be set to a string value, was: " . $secureKey);
+        }
+
         return GopaySoap::createPaymentCommand(
-            $this->getGoId(),
+            $goId,
             $this->getDescription(),
             $this->getAmountInteger(),
             $this->getCurrency(),
@@ -41,7 +51,7 @@ class PurchaseRequest extends AbstractSoapRequest
             null,
             null,
             '',
-            $this->getSecureKey(),
+            $secureKey,
             $this->getCard()->getFirstName(),
             $this->getCard()->getLastName(),
             $this->getCard()->getBillingCity(),
