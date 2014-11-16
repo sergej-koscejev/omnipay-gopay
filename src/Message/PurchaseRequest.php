@@ -2,14 +2,12 @@
 
 namespace Omnipay\Gopay\Message;
 
-use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\Gopay\Api\GopayConfig;
 use Omnipay\Gopay\Api\GopaySoap;
 
-class PurchaseRequest extends AbstractRequest
+class PurchaseRequest extends AbstractSoapRequest
 {
-
     public function setGoId($value)
     {
         return $this->setParameter('goId', $value);
@@ -74,13 +72,7 @@ class PurchaseRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-        $paymentStatus = $this->createClient()->__call('createPayment', array('paymentCommand' => $data));
+        $paymentStatus = $this->soapClient->createPayment(array('paymentCommand' => $data));
         return $this->response = new PurchaseResponse($this, $paymentStatus);
-    }
-
-    protected function createClient()
-    {
-        $url = $this->getTestMode() ? GopayConfig::TEST_WSDL_URL : GopayConfig::PROD_WSDL_URL;
-        return GopaySoap::createSoapClient($url);
     }
 }
