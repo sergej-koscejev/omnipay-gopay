@@ -2,9 +2,11 @@
 
 namespace Omnipay\Gopay;
 
+use Guzzle\Http\ClientInterface;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Gopay\Api\GopayConfig;
 use Omnipay\Gopay\Api\GopaySoap;
+use Symfony\Component\HttpFoundation\Request;
 
 class Gateway extends AbstractGateway {
 
@@ -13,10 +15,10 @@ class Gateway extends AbstractGateway {
      */
     private $soapClient;
 
-    public function __construct($soapClient = null)
+    public function __construct($soapClient = null, ClientInterface $httpClient = null, Request $httpRequest = null)
     {
         $this->soapClient = $soapClient;
-        $this->initialize();
+        parent::__construct($httpClient, $httpRequest);
     }
 
     public function getName()
@@ -51,8 +53,7 @@ class Gateway extends AbstractGateway {
 
     protected function createRequest($class, array $parameters)
     {
-        $obj = new $class($this->getSoapClient());
-
+        $obj = new $class($this->getSoapClient(), $this->httpClient, $this->httpRequest);
         return $obj->initialize(array_replace($this->getParameters(), $parameters));
     }
 
@@ -70,5 +71,10 @@ class Gateway extends AbstractGateway {
     public function purchase(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Gopay\Message\PurchaseRequest', $parameters);
+    }
+
+    public function completePurchase(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Gopay\Message\CompletePurchaseRequest', $parameters);
     }
 }

@@ -6,22 +6,13 @@ use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\ResponseInterface;
 use Omnipay\Gopay\Api\GopaySoap;
 
-class PurchaseRequest extends AbstractSoapRequest
+class PurchaseRequest extends AbstractGopayRequest
 {
-    public function setGoId($value)
-    {
-        return $this->setParameter('goId', $value);
-    }
-
-    public function setSecureKey($value)
-    {
-        return $this->setParameter('secureKey', $value);
-    }
-
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
      *
+     * @throws InvalidRequestException if proper parameters are not set
      * @return mixed
      */
     public function getData()
@@ -64,16 +55,6 @@ class PurchaseRequest extends AbstractSoapRequest
         );
     }
 
-    public function getGoId()
-    {
-        return $this->getParameter('goId');
-    }
-
-    public function getSecureKey()
-    {
-        return $this->getParameter('secureKey');
-    }
-
     /**
      * Send the request with specified data
      *
@@ -83,6 +64,6 @@ class PurchaseRequest extends AbstractSoapRequest
     public function sendData($data)
     {
         $paymentStatus = $this->soapClient->createPayment(array('paymentCommand' => $data));
-        return $this->response = new PurchaseResponse($this, $paymentStatus);
+        return $this->response = new PaymentStatusResponse($this, $paymentStatus);
     }
 }

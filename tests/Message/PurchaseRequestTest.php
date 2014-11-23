@@ -8,12 +8,12 @@ use Omnipay\Tests\TestCase;
 class PurchaseRequestTest extends TestCase
 {
     /**
-     * @var PurchaseRequest
+     * @var \SoapClient
      */
     private $soapClient;
 
     /**
-     * @var \SoapClient
+     * @var PurchaseRequest
      */
     private $request;
 
@@ -22,7 +22,7 @@ class PurchaseRequestTest extends TestCase
         parent::setUp();
         $this->soapClient = $this->getMockFromWsdl(__DIR__ . '/../EPaymentServiceV2.wsdl');
 
-        $this->request = new PurchaseRequest($this->soapClient);
+        $this->request = new PurchaseRequest($this->soapClient, $this->getHttpClient(), $this->getHttpRequest());
     }
 
     public function testGetDataWithCard()

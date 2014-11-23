@@ -4,14 +4,15 @@ namespace Omnipay\Gopay\Message;
 
 use Omnipay\Common\Exception\InvalidResponseException;
 use Omnipay\Gopay\Api\GopayHelper;
+use Omnipay\Gopay\GatewayTest;
 use Omnipay\Tests\TestCase;
 use stdClass;
 
-class PurchaseResponseTest extends TestCase {
+class PaymentStatusResponseTest extends TestCase {
 
-    const SECURE_KEY = '0123456789abcdef';
+    const SECURE_KEY = GatewayTest::SECURE_KEY;
 
-    public static function successfulResponseData($secureKey)
+    public static function paymentStatusWithState($sessionState)
     {
         $data = new stdClass();
         $data->targetGoId = 12345;
@@ -23,32 +24,44 @@ class PurchaseResponseTest extends TestCase {
         $data->parentPaymentSessionId = '';
         $data->preAuthorization = '';
         $data->result = GopayHelper::CALL_COMPLETED;
-        $data->sessionState = GopayHelper::CREATED;
+        $data->sessionState = $sessionState;
         $data->sessionSubState = '';
         $data->paymentChannel = '';
         $data->paymentSessionId = 11112222;
 
         $data->encryptedSignature = GopayHelper::encrypt(
-            GopayHelper::hash(GopayHelper::concatPaymentStatus($data, $secureKey)),
-            $secureKey);
+            GopayHelper::hash(GopayHelper::concatPaymentStatus($data, self::SECURE_KEY)),
+            self::SECURE_KEY);
         return $data;
     }
 
-    public function testConstruct()
+    public function testCreatedState()
     {
-        $data = self::successfulResponseData(self::SECURE_KEY);
+        $data = self::paymentStatusWithState(GopayHelper::CREATED);
 
         $response = $this->createResponseFromData($data);
 
         $this->assertFalse($response->isSuccessful());
         $this->assertTrue($response->isRedirect());
+        $this->assertEquals(11112222, $response->getTransactionReference());
+    }
+
+    public function testPaidState()
+    {
+        $data = self::paymentStatusWithState(GopayHelper::PAID);
+
+        $response = $this->createResponseFromData($data);
+
+        $this->assertTrue($response->isSuccessful());
+        $this->assertFalse($response->isRedirect());
+        $this->assertEquals(11112222, $response->getTransactionReference());
     }
 
     public function testInvalidSignature()
     {
         $this->setExpectedException('Omnipay\Common\Exception\InvalidResponseException');
 
-        $data = self::successfulResponseData(self::SECURE_KEY);
+        $data = self::paymentStatusWithState(GopayHelper::CREATED);
         $data->encryptedSignature = '0123456789012345678901';
 
         $this->createResponseFromData($data);
@@ -56,14 +69,14 @@ class PurchaseResponseTest extends TestCase {
 
     /**
      * @param $data
-     * @return PurchaseResponse
+     * @return PaymentStatusResponse
      */
     public function createResponseFromData($data)
     {
         $request = $this->getMockRequest();
         $request->shouldReceive('getParameters')->andReturn(array('secureKey' => self::SECURE_KEY));
 
-        $response = new PurchaseResponse($request, $data);
+        $response = new PaymentStatusResponse($request, $data);
         return $response;
     }
 }

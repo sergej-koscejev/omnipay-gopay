@@ -556,6 +556,20 @@ class GopayHelper
     }
 
     /**
+     * @param $targetGoId
+     * @param $paymentSessionId
+     * @param $secureKey
+     * @return string
+     */
+    public static function getPaymentIdentitySignature($targetGoId, $paymentSessionId, $parentPaymentSessionId, $orderNumber, $secureKey)
+    {
+        return self::encrypt(
+            self::hash(self::concatPaymentIdentity((float)$targetGoId, (float)$paymentSessionId,
+                $parentPaymentSessionId, $orderNumber, $secureKey)),
+            $secureKey);
+    }
+
+    /**
      * Sifrovani dat 3DES
      *
      * @param string $data - retezec, ktery se sifruje

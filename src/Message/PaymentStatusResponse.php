@@ -9,7 +9,7 @@ use Omnipay\Common\Message\RequestInterface;
 use Omnipay\Gopay\Api\GopayConfig;
 use Omnipay\Gopay\Api\GopayHelper;
 
-class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
+class PaymentStatusResponse extends AbstractResponse implements RedirectResponseInterface
 {
     public function __construct(RequestInterface $request, $data)
     {
@@ -33,7 +33,9 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
      */
     public function isSuccessful()
     {
-        return false;
+        $data = $this->getData();
+        return $data->result == GopayHelper::CALL_COMPLETED
+            && $data->sessionState == GopayHelper::PAID;
     }
 
     public function isTransparentRedirect()
@@ -59,6 +61,10 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
         return $this->getData()->resultDescription;
     }
 
+    public function getTransactionReference()
+    {
+        return $this->getData()->paymentSessionId;
+    }
 
     /**
      * Gets the redirect target url.
