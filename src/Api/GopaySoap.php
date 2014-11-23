@@ -312,15 +312,16 @@ class GopaySoap
      * Vypina WSDL cache a vytvari SOAP klienta pro GoPay WS
      *
      * @param $wsdlUrl string|null URL web service WSDL
+     * @param array $options SoapClient options
      * @return SoapClient
      */
-    public static function createSoapClient($wsdlUrl = null)
+    public static function createSoapClient($wsdlUrl = null, $options = array())
     {
         if (is_null($wsdlUrl)) {
             $wsdlUrl = GopayConfig::ws();
         }
         //ini_set("soap.wsdl_cache_enabled", "0");
-        $go_client = new SoapClient($wsdlUrl, array());
+        $go_client = new SoapClient($wsdlUrl, $options);
         return $go_client;
     }
 

@@ -63,7 +63,7 @@ class PurchaseRequest extends AbstractGopayRequest
      */
     public function sendData($data)
     {
-        $paymentStatus = $this->soapClient->createPayment(array('paymentCommand' => $data));
+        $paymentStatus = $this->soapClient->createPayment($data);
         return $this->response = new PaymentStatusResponse($this, $paymentStatus);
     }
 }

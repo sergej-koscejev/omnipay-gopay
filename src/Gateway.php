@@ -57,12 +57,12 @@ class Gateway extends AbstractGateway {
         return $obj->initialize(array_replace($this->getParameters(), $parameters));
     }
 
-    protected function getSoapClient()
+    public function getSoapClient()
     {
         if (is_null($this->soapClient))
         {
             $url = $this->getTestMode() ? GopayConfig::TEST_WSDL_URL : GopayConfig::PROD_WSDL_URL;
-            $this->soapClient = GopaySoap::createSoapClient($url);
+            $this->soapClient = GopaySoap::createSoapClient($url, $this->getTestMode() ? array('trace' => true) : array());
         }
 
         return $this->soapClient;

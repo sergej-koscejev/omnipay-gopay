@@ -43,7 +43,7 @@ class CompletePurchaseRequestTest extends TestCase
 
         $this->getHttpRequest()->query->replace($notificationParams);
         $this->soapClient->expects($this->once())->method('paymentStatus')
-            ->with(array('paymentSessionInfo' => $paymentStatusParams))
+            ->with($paymentStatusParams)
             ->will($this->returnValue($paymentStatusResponse));
 
         $this->request = new CompletePurchaseRequest($this->soapClient, $this->getHttpClient(), $this->getHttpRequest());

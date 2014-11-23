@@ -45,7 +45,7 @@ class CompletePurchaseRequest extends AbstractGopayRequest {
             "encryptedSignature" => GopayHelper::getPaymentSessionSignature($this->getGoId(), $data['paymentSessionId'],
                 $this->getSecureKey()));
 
-        $paymentStatus = $this->soapClient->paymentStatus(array('paymentSessionInfo' => $paymentSession));
+        $paymentStatus = $this->soapClient->paymentStatus($paymentSession);
         return new PaymentStatusResponse($this, $paymentStatus);
     }
 }
